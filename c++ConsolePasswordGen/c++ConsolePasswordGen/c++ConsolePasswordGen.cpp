@@ -1,59 +1,58 @@
 #include <iostream>
-using namespace std;
+#include <chrono>
 
-bool isRunning;
+// Define clear crossplatform
+#ifdef _WIN32
+#define clear system("cls");
+#elif defined __unix__
+#define clear system("clear");
+#elif defined __APPLE__
+#define clear system("clear");
+#endif
+
 int length;
 
-void makePassword()
-{
-	cout << "PASSWORD =" << endl;
+// Time since epoch function
+int timeSinceEpochNanosec() {
+	using namespace std::chrono;
+	return duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
+}
 
+// Make password function
+void makePassword(int length)
+{
+	std::cout << "PASSWORD =" << std::endl;
 	for (int i = 0; i < length; i++)
-		cout << rand();
-	cout << endl;
+	{
+		srand(timeSinceEpochNanosec()); // Set random seed
+		std::cout << (rand() % 9) + 1; // Random number between 0 and 9
+	}
+	std::cout << std::endl;
 }
 
 void userInput()
 {
-	int* trueFalse;
-	int* internalLength;
+	int trueFalse;
 
-	trueFalse = new int;
-	internalLength = new int;
-	cout << "Please provide a length for the password" << endl;
-	cin >> *internalLength;
+	std::cout << "Please provide a length for the password" << std::endl;
+	std::cin >> length;
 
-	if (*internalLength > 101)
-	{
-		*internalLength = 5;
-		cout << "Password was too long. New length" <<endl;
-		cout << *internalLength;
-		cout << endl;
-	}
+	std::cout << "Generat passord with length with choosen length? (1 = yes, 0 = no)" << std::endl;
+	std::cin >> trueFalse;
 
-	cout << "Generat passord with length with choosen length? (1 = yes, 0 = no)" << endl;
-	cin >> *trueFalse;
-
-	if (*trueFalse == 1) 
-	{
-		length = *internalLength;
-		delete internalLength;
-		delete trueFalse;
-		makePassword();
-	}
-	else
-	{
-		system("cls");
-		delete trueFalse;
-		delete internalLength;
+	switch (trueFalse) {
+	case 1:
+		makePassword(length);
+		break;
+	case 2:
+		clear;
 		userInput();
+		break;
 	}
 }
 
 int main()
 {
-	isRunning = true;
 	userInput();
-
-    return 0;
+	return 0;
 }
